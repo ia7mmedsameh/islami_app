@@ -16,7 +16,7 @@ class AppRouter {
       case Routes.navigationScreen:
         return MaterialPageRoute(builder: (_) => const NavigationScreen());
       case Routes.homeScreen:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        return MaterialPageRoute(builder: (_) =>  const HomeScreen());
       case Routes.surahDetailsScreen:
         return MaterialPageRoute(
           builder: (_) =>
