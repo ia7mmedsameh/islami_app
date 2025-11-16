@@ -9,14 +9,20 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit(this.homeRepo) : super(const HomeState.initial());
 
   void getAllSurahs() async {
+    if (isClosed) return;
     emit(const HomeState.surahsLoading());
     final response = await homeRepo.getAllSurahs();
+    if (isClosed) return;
     response.when(
       success: (surahsResponseModel) {
-        emit(HomeState.surahsSuccess(surahsResponseModel));
+        if (!isClosed) {
+          emit(HomeState.surahsSuccess(surahsResponseModel));
+        }
       },
       failure: (apiErrorModel) {
-        emit(HomeState.surahsError(apiErrorModel));
+        if (!isClosed) {
+          emit(HomeState.surahsError(apiErrorModel));
+        }
       },
     );
   }

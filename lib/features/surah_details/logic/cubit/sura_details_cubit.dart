@@ -9,17 +9,23 @@ class SuraDetailsCubit extends Cubit<SuraDetailsState> {
     : super(const SuraDetailsState.initial());
 
   void getSuraDetailsByNumber(int number) async {
+    if (isClosed) return;
     emit(const SuraDetailsState.suraDetailsStateLoading());
 
     final response = await suraDetailsRepo.getSuraDetailsByNumber(number);
+    if (isClosed) return;
     response.when(
       success: (suraDetailsResponseModel) {
-        emit(
-          SuraDetailsState.suraDetailsStateSuccess(suraDetailsResponseModel),
-        );
+        if (!isClosed) {
+          emit(
+            SuraDetailsState.suraDetailsStateSuccess(suraDetailsResponseModel),
+          );
+        }
       },
       failure: (apiErrorModel) {
-        emit(SuraDetailsState.suraDetailsStateError(apiErrorModel));
+        if (!isClosed) {
+          emit(SuraDetailsState.suraDetailsStateError(apiErrorModel));
+        }
       },
     );
   }

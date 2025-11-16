@@ -37,7 +37,7 @@ class AppTextField extends StatelessWidget {
           child: SvgPicture.asset(prefixIcon),
         ),
         filled: true,
-        fillColor: ColorsManager.black.withOpacity(0.8),
+        fillColor: ColorsManager.black.withValues(alpha: 0.8),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(

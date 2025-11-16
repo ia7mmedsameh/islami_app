@@ -2,8 +2,11 @@ class ApiConstants {
   static const String apiBaseUrl = 'https://api.alquran.cloud/v1/';
   static const String surah = 'surah';
   static const String surahByNumber = '/surah/{number}';
+  static const String apiKey =
+      r'$2y$10$oI9gqN0aLP4GnPn6ddMWDrDxaEF1eubikXBtkNz6S1AljyppG';
+  static const String apiBaseUrlAhadith = 'https://hadithapi.com/public/api/';
+  static const String ahadith = 'hadiths';
 }
-
 
 class ApiErrors {
   static const String badRequestError = "badRequestError";

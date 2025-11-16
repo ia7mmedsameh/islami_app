@@ -7,7 +7,7 @@ class SurahsResponseModel {
 
   SurahsResponseModel({this.data});
 
-factory  SurahsResponseModel.fromJson(Map<String, dynamic> json) =>
+  factory SurahsResponseModel.fromJson(Map<String, dynamic> json) =>
       _$SurahsResponseModelFromJson(json);
 }
 
@@ -29,5 +29,6 @@ class SurahsData {
     this.revelationType,
   });
 
-  factory SurahsData.fromJson(Map<String, dynamic> json) => _$SurahsDataFromJson(json);
+  factory SurahsData.fromJson(Map<String, dynamic> json) =>
+      _$SurahsDataFromJson(json);
 }

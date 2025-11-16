@@ -64,18 +64,18 @@ class SalomonBottomBar extends StatelessWidget {
 
                   return Material(
                     color: Color.lerp(
-                      selectedColor.withOpacity(0.0),
-                      selectedColor.withOpacity(selectedColorOpacity ?? 0.5),
+                      selectedColor.withValues(alpha: 0.0),
+                      selectedColor.withValues(alpha: selectedColorOpacity ?? 0.5),
                       t,
                     ),
                     shape: itemShape,
                     child: InkWell(
                       onTap: () => onTap?.call(items.indexOf(item)),
                       customBorder: itemShape,
-                      focusColor: selectedColor.withOpacity(0.1),
-                      highlightColor: selectedColor.withOpacity(0.1),
-                      splashColor: selectedColor.withOpacity(0.1),
-                      hoverColor: selectedColor.withOpacity(0.1),
+                      focusColor: selectedColor.withValues(alpha: 0.1),
+                      highlightColor: selectedColor.withValues(alpha: 0.1),
+                      splashColor: selectedColor.withValues(alpha: 0.1),
+                      hoverColor: selectedColor.withValues(alpha: 0.1),
                       child: Padding(
                         padding: scaledPadding -
                             (Directionality.of(context) == TextDirection.ltr
@@ -116,7 +116,7 @@ class SalomonBottomBar extends StatelessWidget {
                                         fontWeight: FontWeight.w600,
                                         height: 1.2,
                                         color: Color.lerp(
-                                          selectedColor.withOpacity(0.0),
+                                          selectedColor.withValues(alpha: 0.0),
                                           selectedColor,
                                           t,
                                         ),
