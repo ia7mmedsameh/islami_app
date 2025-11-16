@@ -1,32 +1,26 @@
 import 'package:flutter/material.dart';
 
 class SplashAnimations {
-  // Mosque
   late final AnimationController mosqueCtrl;
   late final Animation<double> mosqueOpacity;
 
-  // Logo intro + pulse
   late final AnimationController logoIntroCtrl;
   late final Animation<double> logoIntroScale;
   late final AnimationController logoPulseCtrl;
   late final Animation<double> logoPulseScale;
 
-  // Name
   late final AnimationController nameCtrl;
   late final Animation<Offset> nameOffset;
 
-  // Glow
   late final AnimationController glowCtrl;
   late final Animation<Offset> glowOffset;
   late final Animation<double> glowOpacity;
 
-  // Shapes
   late final AnimationController leftShapeCtrl;
   late final Animation<Offset> leftShapeOffset;
   late final AnimationController rightShapeCtrl;
   late final Animation<Offset> rightShapeOffset;
 
-  // Screen Fade
   late final AnimationController screenFadeCtrl;
   late final Animation<double> screenFade;
 

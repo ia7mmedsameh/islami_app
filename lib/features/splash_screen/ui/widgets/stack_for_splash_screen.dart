@@ -38,34 +38,27 @@ class StackForSplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Background
         const BackGroundSplash(),
     
-        // Mosque
         MosqueSplash(mosqueOpacity: _mosqueOpacity),
     
-        // Glow
         GlowSplash(glowOpacity: _glowOpacity, glowOffset: _glowOffset),
     
-        // Left shape
         LeftShapeSplash(
           screenH: screenH,
           leftShapeOffset: _leftShapeOffset,
         ),
     
-        // Right shape
         RightShapeSplash(
           screenH: screenH,
           rightShapeOffset: _rightShapeOffset,
         ),
     
-        // Logo + Islami
         CenterLogoSplash(
           logoIntroScale: _logoIntroScale,
           logoPulseScale: _logoPulseScale,
         ),
     
-        // Ahmed Sameh (Bounce)
         BottomNameAhmedSamehSplash(
           nameOffset: _nameOffset,
           nameCtrl: _nameCtrl,

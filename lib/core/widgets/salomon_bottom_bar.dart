@@ -86,7 +86,7 @@ class SalomonBottomBar extends StatelessWidget {
                             IconTheme(
                               data: IconThemeData(
                                 color: Color.lerp(unselectedColor, selectedColor, t),
-                                size: 24.sp, // responsive icon size
+                                size: 24.sp,
                               ),
                               child: items.indexOf(item) == currentIndex
                                   ? item.activeIcon ?? item.icon
@@ -112,7 +112,7 @@ class SalomonBottomBar extends StatelessWidget {
                                           ),
                                     child: DefaultTextStyle.merge(
                                       style: TextStyle(
-                                        fontSize: 16.sp, // responsive text
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.w600,
                                         height: 1.2,
                                         color: Color.lerp(

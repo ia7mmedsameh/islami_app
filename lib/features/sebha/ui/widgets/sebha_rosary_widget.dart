@@ -23,24 +23,20 @@ class SebhaRosaryWidget extends StatelessWidget {
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            // Rosary image
             Image.asset(
               Assets.imagesSebha,
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.contain,
             ),
-            // Center content - positioned at 75% from bottom
             Positioned.fill(
               child: Align(
                 alignment: const Alignment(0, 0.3),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Arabic text: سبحان الله
                     Text('سبحان الله', style: AppTextStyles.font36WhiteBold),
                     verticalSpace(10),
-                    // Counter
                     Text(
                       '$counter',
                       style: AppTextStyles.font36WhiteBold.copyWith(

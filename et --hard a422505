@@ -1,0 +1,14 @@
+[33m0231a07[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33ma422505[m HEAD@{1}: commit: Added multiple improvements and new updates across the project
+[33m0231a07[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{2}: commit: some changes
+[33md0972b1[m HEAD@{3}: commit: permission internet
+[33mc1800fb[m HEAD@{4}: commit: home screen with search + details surah with audio is done
+[33mb41c88a[m HEAD@{5}: commit: add initial SurahDetailsScreen and minor UI adjustments
+[33m284aa8b[m HEAD@{6}: commit: Completed HomeCubit, added Shimmer loading for Surahs, and minor UI adjustments
+[33m88e477b[m HEAD@{7}: commit: setup API services with dependency injection
+[33m323ff38[m HEAD@{8}: commit: complete home page ui + add bottom navigation bar + some refactor code
+[33m2a99395[m HEAD@{9}: commit: Refactor SplashScreen, update app icon, and integrate Hive for onboarding (show only once)
+[33m0607391[m HEAD@{10}: commit: I made some updates to the onboarding screen
+[33m52bfe59[m HEAD@{11}: commit: onboarding screen done
+[33m5072207[m HEAD@{12}: Branch: renamed refs/heads/master to refs/heads/main
+[33m5072207[m HEAD@{14}: commit (initial): first commit

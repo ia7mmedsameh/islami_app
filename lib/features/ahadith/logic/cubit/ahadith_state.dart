@@ -8,7 +8,6 @@ part 'ahadith_state.freezed.dart';
 class AhadithState with _$AhadithState {
   const factory AhadithState.initial() = _Initial;
 
-  // ahadith
   const factory AhadithState.ahadithLoading() = AhadithLoading;
   const factory AhadithState.ahadithSuccess(
     AhadithResponseModel ahadithResponseModel,

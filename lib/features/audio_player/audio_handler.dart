@@ -19,24 +19,20 @@ class IslamiAudioHandler extends BaseAudioHandler {
   }
 
   void _notifyAudioHandlerAboutPlaybackEvents() {
-    // 💡 هذا السماع هو المسؤول عن تحديث الإشعار وإرسال تحديثات الموضع (position)
     _player.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;
 
       playbackState.add(playbackState.value.copyWith(
-        // ✅ التحكمات في الإشعار: Play/Pause و Stop فقط
         controls: [
           isPlaying ? MediaControl.pause : MediaControl.play,
           MediaControl.stop,
         ],
         
-        // ✅ تفعيل Seek (شريط التقدم)
         systemActions: const {
           MediaAction.seek,
         },
         
-        // ✅ زر Play/Pause هو الزر الوحيد في الوضع المضغوط
         androidCompactActionIndices: const [0], 
         
         processingState: {
@@ -47,38 +43,31 @@ class IslamiAudioHandler extends BaseAudioHandler {
           ProcessingState.completed: AudioProcessingState.completed,
         }[processingState] ?? AudioProcessingState.idle,
         
-        // 💡 إرسال حالة اللعب والموضع والـ Buffer
         playing: isPlaying,
         bufferedPosition: _player.bufferedPosition,
-        updatePosition: _player.position, // ✅ هذا هو مصدر تحديث شريط الـ Slider في الـ UI
+        updatePosition: _player.position,
       ));
     });
   }
 
-  /// 🎧 تشغيل سورة جديدة (يتم استدعاؤها من الـ Cubit)
-Future<void> playSurah(String url, String title) async {
+  Future<void> playSurah(String url, String title) async {
     await _player.stop();
     
-    // 1. ✅ الخطوة الأولى: إنشاء MediaItem وتحديثه فوراً.
-    //    هذا هو الجزء الحاسم لظهور النوتفيكيشن
     mediaItem.add(
       MediaItem(
         id: url,
-        title: title, // يعرض اسم السورة في الإشعار
+        title: title,
         artist: 'القرآن الكريم',
       ),
     );
 
-    // 2. ✅ الخطوة الثانية: تعيين مصدر الصوت.
     await _player.setAudioSource(AudioSource.uri(Uri.parse(url)));
     
-    // 3. ✅ الخطوة الثالثة: البدء بالتشغيل.
     await _player.play();
   }
 
   @override
   Future<void> play() async {
-    // 💡 عند الانتهاء، يعود للصفر ثم يبدأ
     if (_player.processingState == ProcessingState.completed) {
       await _player.seek(Duration.zero);
     }
@@ -90,7 +79,6 @@ Future<void> playSurah(String url, String title) async {
 
   @override
   Future<void> stop() async {
-    // الإيقاف النهائي للخدمة
     await _player.stop();
     await _player.dispose();
     return super.stop(); 
@@ -99,10 +87,8 @@ Future<void> playSurah(String url, String title) async {
   @override
   Future<void> seek(Duration position) => _player.seek(position);
 
-  /// 🔊 التحكم في الصوت
   Future<void> setVolume(double volume) => _player.setVolume(volume);
 
-  /// 💡 لإيقاف التشغيل وإزالة النوتفيكيشن عند الخروج من شاشة السورة
   Future<void> stopPlayer() async {
     await _player.stop();
     mediaItem.add(null); 

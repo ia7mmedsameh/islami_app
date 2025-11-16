@@ -12,17 +12,13 @@ import 'package:islami_app/features/radios/logic/audio_handler/radio_audio_handl
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // DI
   await setupGetIt();
 
-  // Hive
   await Hive.initFlutter();
   await Hive.openBox(kOnboardingBoxName);
 
-  // Lock Orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  // 🔊 Initialize AudioService ONE TIME ONLY
   final handler = await AudioService.init(
     builder: () => RadioAudioHandler(),
     config: const AudioServiceConfig(
@@ -37,7 +33,6 @@ Future<void> main() async {
     ),
   );
 
-  // Register handler globally for Radio + Quran
   getIt.registerSingleton<RadioAudioHandler>(handler);
 
   runApp(IslamiApp(appRouter: AppRouter()));

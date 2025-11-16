@@ -48,7 +48,6 @@ class RadioAudioHandler extends BaseAudioHandler {
     }
   }
 
-  // 🔊 تشغيل الراديو (زي ما كان)
   Future<void> playRadio(String url, String name) async {
     await _player.stop();
 
@@ -65,7 +64,6 @@ class RadioAudioHandler extends BaseAudioHandler {
     await _player.play();
   }
 
-  // 🔊 إعداد بيانات القرآن عشان النوتفيكيشن
   Future<void> setQuranMedia({
     required String url,
     required String surahName,

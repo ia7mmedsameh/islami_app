@@ -42,10 +42,8 @@ class _SebhaScreenState extends State<SebhaScreen> {
       backgroundColor: ColorsManager.black,
       body: Stack(
         children: [
-          // Background image
           const BackgroundForSebhaScreen(),
           const ColorLinearForSebhaScreen(),
-          // Content
           SafeArea(
             child: Column(
               children: [

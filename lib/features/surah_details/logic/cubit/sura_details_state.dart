@@ -7,7 +7,6 @@ part 'sura_details_state.freezed.dart';
 class SuraDetailsState with _$SuraDetailsState {
   const factory SuraDetailsState.initial() = _Initial;
 
-  // details elsura
   const factory SuraDetailsState.suraDetailsStateLoading() =
       SuraDetailsStateLoading;
   const factory SuraDetailsState.suraDetailsStateSuccess(

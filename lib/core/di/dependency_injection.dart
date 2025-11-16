@@ -20,33 +20,24 @@ final getIt = GetIt.instance;
 Future<void> setupGetIt() async {
   Dio dio = DioFactory.getDio();
 
-  // APIs
   getIt.registerLazySingleton<ApiService>(() => ApiService(dio));
   getIt.registerLazySingleton<HadithApiService>(() => HadithApiService(dio));
   getIt.registerLazySingleton<RadioApiService>(() => RadioApiService(dio));
 
-  // Home
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepo(getIt()));
   getIt.registerFactory<HomeCubit>(() => HomeCubit(getIt()));
 
-  // Surah Details
   getIt.registerLazySingleton<SuraDetailsRepo>(() => SuraDetailsRepo(getIt()));
   getIt.registerFactory<SuraDetailsCubit>(() => SuraDetailsCubit(getIt()));
 
-  // ❗❗ مفيش تسجيل RadioAudioHandler هنا
-  // لأنه بيتسجّل Singleton في main.dart بعد AudioService.init
-
-  // 🔊 Quran AudioCubit → بياخد نفس الـ handler بتاع الراديو
   getIt.registerFactory<AudioCubit>(
     () => AudioCubit(getIt<RadioAudioHandler>()),
   );
 
-  // Radio
   getIt.registerLazySingleton<RadioRepo>(() => RadioRepo(getIt()));
   getIt.registerFactory<RadiosCubit>(() => RadiosCubit(getIt()));
   getIt.registerFactory<RadioCubit>(() => RadioCubit());
 
-  // Ahadith
   getIt.registerLazySingleton<AhadithRepo>(() => AhadithRepo(getIt()));
   getIt.registerFactory<AhadithCubit>(() => AhadithCubit(getIt()));
 }

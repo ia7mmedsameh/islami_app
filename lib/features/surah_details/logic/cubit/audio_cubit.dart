@@ -13,7 +13,7 @@ class AudioCubit extends Cubit<AudioState> {
   StreamSubscription<PlayerState>? _playerStateSub;
 
   AudioCubit(this._audioHandler) : super(const AudioState.initial()) {
-    _audioPlayer = _audioHandler.player; // نفس البلاير بتاع الراديو
+    _audioPlayer = _audioHandler.player;
   }
 
   Future<void> setAudioSource(int surahNumber, String surahName) async {
@@ -41,7 +41,6 @@ class AudioCubit extends Cubit<AudioState> {
 
       if (isClosed) return;
 
-      // 🟡 مهم: نحط ميتا داتا للقرآن عشان النوتفيكيشن
       await _audioHandler.setQuranMedia(
         url: finalUrl,
         surahName: surahName,
@@ -66,7 +65,9 @@ class AudioCubit extends Cubit<AudioState> {
       });
 
       _playerStateSub?.cancel();
-      _playerStateSub = _audioPlayer.playerStateStream.listen((playerState) async {
+      _playerStateSub = _audioPlayer.playerStateStream.listen((
+        playerState,
+      ) async {
         if (!isClosed && state is Success) {
           final current = state as Success;
 
@@ -100,7 +101,6 @@ class AudioCubit extends Cubit<AudioState> {
   Future<void> close() async {
     await _positionSub?.cancel();
     await _playerStateSub?.cancel();
-    // مهم: منوحش نعمل dispose هنا لأن نفس البلاير مستخدم في الراديو
     return super.close();
   }
 }

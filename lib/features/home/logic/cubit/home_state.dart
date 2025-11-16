@@ -8,7 +8,6 @@ part 'home_state.freezed.dart';
 class HomeState with _$HomeState {
   const factory HomeState.initial() = _Initial;
 
-  // surahs
   const factory HomeState.surahsLoading() = SurahsLoading;
   const factory HomeState.surahsSuccess(
     SurahsResponseModel surahsResponseModel,
