@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islami_app/core/helpers/app_assets.dart';
+import 'package:islami_app/core/helpers/extensions.dart';
+import 'package:islami_app/core/routing/routes.dart';
 import 'package:islami_app/features/ahadith/data/models/ahadith_response_model.dart';
 import 'package:islami_app/features/ahadith/ui/widgets/bloc_builder_ahadith.dart';
 
-class ContentCardAhadith extends StatelessWidget {
+class ContentCardAhadith extends StatefulWidget {
   final Data data;
   final int index;
   const ContentCardAhadith({
@@ -12,6 +14,13 @@ class ContentCardAhadith extends StatelessWidget {
     required this.index,
     required this.data,
   });
+
+  @override
+  State<ContentCardAhadith> createState() => _ContentCardAhadithState();
+}
+
+class _ContentCardAhadithState extends State<ContentCardAhadith> {
+  Data? currentHadith;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +47,31 @@ class ContentCardAhadith extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 5.w),
-              child: BlocBuilderAhadith(index: index),
+              child: BlocBuilderAhadith(
+                index: widget.index,
+                onHadithReady: (hadith) {
+                  if (mounted) {
+                    setState(() {
+                      currentHadith = hadith;
+                    });
+                  }
+                },
+              ),
             ),
-            
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  if (currentHadith != null) {
+                    context.pushNamed(
+                      Routes.hadithDetailsScreen,
+                      arguments: currentHadith,
+                    );
+                  }
+                },
+                child: Container(color: Colors.transparent),
+              ),
+            ),
           ],
         ),
       ),

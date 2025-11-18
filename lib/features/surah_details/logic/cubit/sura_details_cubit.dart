@@ -3,10 +3,12 @@ import 'package:islami_app/core/networking/api_result.dart';
 import 'package:islami_app/features/surah_details/data/repos/sura_details_repo.dart';
 import 'package:islami_app/features/surah_details/logic/cubit/sura_details_state.dart';
 
+/// Cubit responsible for managing surah details state
 class SuraDetailsCubit extends Cubit<SuraDetailsState> {
   final SuraDetailsRepo suraDetailsRepo;
+  
   SuraDetailsCubit(this.suraDetailsRepo)
-    : super(const SuraDetailsState.initial());
+      : super(const SuraDetailsState.initial());
 
   void getSuraDetailsByNumber(int number) async {
     if (isClosed) return;

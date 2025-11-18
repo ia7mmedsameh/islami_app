@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:islami_app/core/routing/routes.dart';
+import 'package:islami_app/features/ahadith/data/models/ahadith_response_model.dart';
+import 'package:islami_app/features/ahadith/ui/hadith_details_screen.dart';
 import 'package:islami_app/features/navigation/ui/navigation_screen.dart';
 import 'package:islami_app/features/onboarding/ui/onboarding_screen.dart';
 import 'package:islami_app/features/splash_screen/ui/splash_screen.dart';
@@ -18,6 +20,11 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) =>
               SurahDetailsScreen(surahNumber: settings.arguments as int),
+        );
+      case Routes.hadithDetailsScreen:
+        return MaterialPageRoute(
+          builder: (_) =>
+              HadithDetailsScreen(hadith: settings.arguments as Data),
         );
       default:
         return null;

@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -11,51 +10,51 @@ import 'package:islami_app/features/ahadith/data/models/ahadith_response_model.d
 import 'package:lottie/lottie.dart';
 
 class DetailsAhadith extends StatelessWidget {
-  const DetailsAhadith({
-    super.key,
-    required this.hadith,
-  });
+  const DetailsAhadith({super.key, required this.hadith});
 
   final Data hadith;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
-            children: [
-              Image.asset(
-                Assets.imagesMaskGroup,
-                width: 90.w,
-                height: 90.h,
-                color: ColorsManager.black,
-              ),
-              Text(
-                "الحديث رقم ${hadith.hadithNumber ?? 'حدث خطأ غير متوقع'}",
-                style: AppTextStyles.font20BlackBold,
-              ),
-              Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationY(math.pi),
-                child: Image.asset(
+    return IgnorePointer(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(
                   Assets.imagesMaskGroup,
                   width: 90.w,
                   height: 90.h,
                   color: ColorsManager.black,
                 ),
-              ),
-            ],
-          ),
-          verticalSpace(20),
-          Text(
-            hadith.hadithArabic ?? "حدث خطأ غير متوقع",
-            textAlign: TextAlign.center,
-            style: AppTextStyles.font18Blacksemibold,
-          ),
-        ],
+                Text(
+                  "الحديث رقم ${hadith.hadithNumber ?? 'حدث خطأ غير متوقع'}",
+                  style: AppTextStyles.font20BlackBold,
+                ),
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(math.pi),
+                  child: Image.asset(
+                    Assets.imagesMaskGroup,
+                    width: 90.w,
+                    height: 90.h,
+                    color: ColorsManager.black,
+                  ),
+                ),
+              ],
+            ),
+            verticalSpace(20),
+            Text(
+              hadith.hadithArabic ?? "حدث خطأ غير متوقع",
+              textAlign: TextAlign.center,
+              maxLines: 16,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.font18Blacksemibold,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -74,10 +73,7 @@ Widget setupLoading() {
         height: 170.h,
         delegates: LottieDelegates(
           values: [
-            ValueDelegate.color(
-              const ['**'],
-              value: ColorsManager.black,
-            ),
+            ValueDelegate.color(const ['**'], value: ColorsManager.black),
           ],
         ),
       ),

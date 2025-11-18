@@ -1,49 +1,74 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islami_app/features/radios/logic/audio_handler/audio_service_helper.dart';
-import 'package:islami_app/features/radios/logic/audio_handler/radio_audio_handler.dart';
-import 'package:islami_app/features/surah_details/logic/cubit/audio_state.dart';
+import 'package:islami_app/core/audio_handler/radio_audio_handler.dart';
+import 'package:islami_app/features/radios/logic/cubit/radio_state.dart';
 import 'package:just_audio/just_audio.dart';
 
-class RadioCubit extends Cubit<AudioState> {
-  final RadioAudioHandler _handler = AudioServiceHelper.handler;
-  StreamSubscription<PlayerState>? _sub;
+class RadioCubit extends Cubit<RadioState> {
+  late final RadioAudioHandler _handler;
+  late final AudioPlayer _player;
 
-  RadioCubit() : super(const AudioState.initial()) {
-    _listen();
-  }
+  StreamSubscription<PlayerState>? _stateSub;
 
-  void _listen() {
-    _sub = _handler.player.playerStateStream.listen((s) {
-      final playing = s.playing;
-
-      emit(
-        AudioState.success(
-          isPlaying: playing,
-          volume: _handler.player.volume,
-          position: Duration.zero,
-          total: Duration.zero,
-        ),
-      );
-    });
+  RadioCubit() : super(const RadioState.initial()) {
+    _handler = AudioServiceHelper.handler;
+    _player = _handler.player;
   }
 
   Future<void> setRadio(String url, String name) async {
-    emit(const AudioState.loading());
-    await _handler.playRadio(url, name);
+    emit(const RadioState.loading());
+
+    try {
+      await _handler.playRadio(url, name);
+
+      /// أول ما يشتغل الصوت نطلع من اللودينج فوراً
+      emit(RadioState.playing(volume: _player.volume));
+
+      await _stateSub?.cancel();
+      _stateSub = _player.playerStateStream.listen((playerState) {
+        if (isClosed) return;
+
+        /// أهم شرط يعالج المشكلة:
+        if (playerState.playing) {
+          emit(RadioState.playing(volume: _player.volume));
+          return;
+        }
+
+        emit(RadioState.paused(volume: _player.volume));
+      });
+    } catch (_) {
+      if (!isClosed) {
+        emit(const RadioState.error("حدث خطأ أثناء تشغيل الراديو"));
+      }
+    }
   }
 
-  Future<void> pause() => _handler.pause();
+  void pause() {
+    if (isClosed) return;
+    _handler.pause();
+    emit(RadioState.paused(volume: _player.volume));
+  }
 
-  Future<void> resume() => _handler.play();
+  void resume() {
+    if (isClosed) return;
+    _handler.play();
+    emit(RadioState.playing(volume: _player.volume));
+  }
 
-  Future<void> setVolume(double v) async {
-    await _handler.setVolume(v);
+  void setVolume(double v) {
+    if (isClosed) return;
+    _handler.setVolume(v);
+    emit(
+      _player.playing
+          ? RadioState.playing(volume: v)
+          : RadioState.paused(volume: v),
+    );
   }
 
   @override
-  Future<void> close() {
-    _sub?.cancel();
+  Future<void> close() async {
+    await _stateSub?.cancel();
     return super.close();
   }
 }

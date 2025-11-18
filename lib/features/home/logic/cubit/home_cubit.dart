@@ -10,8 +10,38 @@ class HomeCubit extends Cubit<HomeState> {
 
   void getAllSurahs() async {
     if (isClosed) return;
-    emit(const HomeState.surahsLoading());
-    final response = await homeRepo.getAllSurahs();
+    
+    // محاولة جلب البيانات المحلية أولاً (بدون loading)
+    final cachedResponse = homeRepo.getCachedSurahs();
+    if (cachedResponse != null) {
+      cachedResponse.when(
+        success: (surahsResponseModel) {
+          if (!isClosed) {
+            // إذا وُجدت بيانات محلية، نعرضها مباشرة
+            emit(HomeState.surahsSuccess(surahsResponseModel));
+          }
+        },
+        failure: (_) {
+          // إذا فشل parsing البيانات المحلية، نجلب من API
+          if (!isClosed) {
+            emit(const HomeState.surahsLoading());
+            _fetchFromApi();
+          }
+        },
+      );
+      return;
+    }
+    
+    // إذا لم توجد بيانات محلية، نعرض loading ثم نجلب من API
+    if (!isClosed) {
+      emit(const HomeState.surahsLoading());
+      _fetchFromApi();
+    }
+  }
+
+  Future<void> _fetchFromApi() async {
+    if (isClosed) return;
+    final response = await homeRepo.getAllSurahs(forceRefresh: true);
     if (isClosed) return;
     response.when(
       success: (surahsResponseModel) {

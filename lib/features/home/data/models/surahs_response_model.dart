@@ -9,6 +9,10 @@ class SurahsResponseModel {
 
   factory SurahsResponseModel.fromJson(Map<String, dynamic> json) =>
       _$SurahsResponseModelFromJson(json);
+
+  Map<String, dynamic> toJson() => {
+        'data': data?.map((e) => e.toJson()).toList(),
+      };
 }
 
 @JsonSerializable(createToJson: false)
@@ -31,4 +35,13 @@ class SurahsData {
 
   factory SurahsData.fromJson(Map<String, dynamic> json) =>
       _$SurahsDataFromJson(json);
+
+  Map<String, dynamic> toJson() => {
+        'number': number,
+        'name': name,
+        'englishName': englishName,
+        'englishNameTranslation': englishNameTranslation,
+        'numberOfAyahs': numberOfAyahs,
+        'revelationType': revelationType,
+      };
 }

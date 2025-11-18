@@ -8,18 +8,20 @@ import 'package:islami_app/features/home/data/repos/home_repo.dart';
 import 'package:islami_app/features/home/logic/cubit/home_cubit.dart';
 import 'package:islami_app/features/radios/data/repos/radio_repo.dart';
 import 'package:islami_app/features/radios/data/services/radio_api_service.dart';
-import 'package:islami_app/features/radios/logic/audio_handler/radio_audio_handler.dart';
+import 'package:islami_app/core/audio_handler/radio_audio_handler.dart';
 import 'package:islami_app/features/radios/logic/cubit/radio_cubit.dart';
 import 'package:islami_app/features/radios/logic/cubit/radios_cubit.dart';
 import 'package:islami_app/features/surah_details/data/repos/sura_details_repo.dart';
 import 'package:islami_app/features/surah_details/logic/cubit/audio_cubit.dart';
 import 'package:islami_app/features/surah_details/logic/cubit/sura_details_cubit.dart';
+import 'package:just_audio/just_audio.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupGetIt() async {
   Dio dio = DioFactory.getDio();
 
+  // Network
   getIt.registerLazySingleton<ApiService>(() => ApiService(dio));
   getIt.registerLazySingleton<HadithApiService>(() => HadithApiService(dio));
   getIt.registerLazySingleton<RadioApiService>(() => RadioApiService(dio));
@@ -30,6 +32,21 @@ Future<void> setupGetIt() async {
   getIt.registerLazySingleton<SuraDetailsRepo>(() => SuraDetailsRepo(getIt()));
   getIt.registerFactory<SuraDetailsCubit>(() => SuraDetailsCubit(getIt()));
 
+  // ---------------------------
+  // 🔥 أهم جزء: AudioPlayer واحد فقط
+  // ---------------------------
+  getIt.registerLazySingleton<AudioPlayer>(() => AudioPlayer());
+
+  // ---------------------------
+  // 🔥 Handler واحد فقط يستخدم نفس AudioPlayer
+  // ---------------------------
+  getIt.registerLazySingleton<RadioAudioHandler>(
+    () => RadioAudioHandler(getIt<AudioPlayer>()),
+  );
+
+  // ---------------------------
+  // 🔥 Cubit يستخدم نفس Handler
+  // ---------------------------
   getIt.registerFactory<AudioCubit>(
     () => AudioCubit(getIt<RadioAudioHandler>()),
   );

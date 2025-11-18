@@ -1,106 +1,116 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:just_audio/just_audio.dart';
-import 'audio_state.dart';
+import 'package:islami_app/features/surah_details/logic/cubit/audio_state.dart';
 import 'package:islami_app/features/surah_details/ui/helper/audio_constants.dart';
-import 'package:islami_app/features/radios/logic/audio_handler/radio_audio_handler.dart';
+import 'package:islami_app/core/audio_handler/radio_audio_handler.dart';
+import 'package:just_audio/just_audio.dart';
 
 class AudioCubit extends Cubit<AudioState> {
-  final RadioAudioHandler _audioHandler;
-  late final AudioPlayer _audioPlayer;
+  final RadioAudioHandler _handler;
+  late final AudioPlayer _player;
+  StreamSubscription<Duration>? _posSub;
+  StreamSubscription<PlayerState>? _stateSub;
+  bool _sentReady = false;
 
-  StreamSubscription<Duration>? _positionSub;
-  StreamSubscription<PlayerState>? _playerStateSub;
-
-  AudioCubit(this._audioHandler) : super(const AudioState.initial()) {
-    _audioPlayer = _audioHandler.player;
+  AudioCubit(this._handler) : super(const AudioState.initial()) {
+    _player = _handler.player;
   }
 
   Future<void> setAudioSource(int surahNumber, String surahName) async {
-    if (isClosed) return;
     emit(const AudioState.loading());
+    _sentReady = false;
     try {
-      final url128 = AudioConstants.getSurahUrl(
+      final url = AudioConstants.getSurahUrl(
         surahNumber: surahNumber,
         bitrate: AudioConstants.bitrate128,
       );
-      final url64 = AudioConstants.getSurahUrl(
-        surahNumber: surahNumber,
-        bitrate: AudioConstants.bitrate64,
-      );
-
-      String finalUrl;
-
-      try {
-        await _audioPlayer.setUrl(url128);
-        finalUrl = url128;
-      } catch (_) {
-        await _audioPlayer.setUrl(url64);
-        finalUrl = url64;
-      }
-
-      if (isClosed) return;
-
-      await _audioHandler.setQuranMedia(
-        url: finalUrl,
+      _posSub?.cancel();
+      _stateSub?.cancel();
+      _posSub = _player.positionStream.listen((p) {
+        if (isClosed || !_sentReady) return;
+        if (state is Success) {
+          emit((state as Success).copyWith(position: p));
+        } else if (_player.playing)
+          _emitSuccess(p);
+      });
+      _stateSub = _player.playerStateStream.listen((s) async {
+        if (isClosed) return;
+        if (!_sentReady &&
+            (s.processingState == ProcessingState.ready || s.playing)) {
+          _checkReady();
+        }
+        if (_sentReady && state is Success) {
+          emit(
+            (state as Success).copyWith(
+              isPlaying: _player.playing,
+              total: _player.duration ?? Duration.zero,
+            ),
+          );
+        }
+        if (s.processingState == ProcessingState.completed) {
+          await _player.seek(Duration.zero);
+          await _player.play();
+        }
+      });
+      _player.durationStream.listen((d) {
+        if (_sentReady && d != null && state is Success && !isClosed) {
+          emit((state as Success).copyWith(total: d));
+        }
+      });
+      await _handler.setQuranMedia(
+        url: url,
         surahName: surahName,
         surahNumber: surahNumber,
       );
-
-      emit(
-        AudioState.success(
-          isPlaying: _audioPlayer.playing,
-          volume: _audioPlayer.volume,
-          position: Duration.zero,
-          total: _audioPlayer.duration ?? Duration.zero,
-        ),
-      );
-
-      _positionSub?.cancel();
-      _positionSub = _audioPlayer.positionStream.listen((position) {
-        if (!isClosed && state is Success) {
-          final current = state as Success;
-          emit(current.copyWith(position: position));
-        }
-      });
-
-      _playerStateSub?.cancel();
-      _playerStateSub = _audioPlayer.playerStateStream.listen((
-        playerState,
-      ) async {
-        if (!isClosed && state is Success) {
-          final current = state as Success;
-
-          if (playerState.processingState == ProcessingState.completed) {
-            await _audioPlayer.seek(Duration.zero);
-            await _audioPlayer.play();
+      if (!_sentReady) {
+        try {
+          await _player.playerStateStream
+              .timeout(const Duration(seconds: 2))
+              .firstWhere(
+                (s) => s.processingState == ProcessingState.ready || s.playing,
+              );
+          _checkReady();
+        } catch (_) {
+          for (int i = 0; i < 20; i++) {
+            await Future.delayed(const Duration(milliseconds: 50));
+            if (isClosed || _sentReady || _checkReady()) break;
           }
-
-          bool playing = _audioPlayer.playing;
-          emit(current.copyWith(isPlaying: playing));
         }
-      });
-
-      await _audioPlayer.play();
-    } catch (e) {
-      if (!isClosed) {
-        emit(const AudioState.error('حدث خطأ غير متوقع'));
       }
+    } catch (_) {
+      if (!isClosed) emit(const AudioState.error("حدث خطأ أثناء تشغيل السورة"));
     }
   }
 
-  void pause() => _audioPlayer.pause();
+  bool _checkReady() {
+    if (_player.processingState == ProcessingState.ready || _player.playing) {
+      _sentReady = true;
+      _emitSuccess(_player.position);
+      return true;
+    }
+    return false;
+  }
 
-  void resume() => _audioPlayer.play();
+  void _emitSuccess(Duration position) {
+    emit(
+      AudioState.success(
+        isPlaying: _player.playing,
+        volume: _player.volume,
+        position: position,
+        total: _player.duration ?? Duration.zero,
+      ),
+    );
+  }
 
-  void seek(Duration position) => _audioPlayer.seek(position);
-
-  void setVolume(double volume) => _audioPlayer.setVolume(volume);
+  void pause() => isClosed ? null : _player.pause();
+  void resume() => isClosed ? null : _player.play();
+  void seek(Duration p) => isClosed ? null : _player.seek(p);
+  void setVolume(double v) => isClosed ? null : _player.setVolume(v);
 
   @override
   Future<void> close() async {
-    await _positionSub?.cancel();
-    await _playerStateSub?.cancel();
+    await _posSub?.cancel();
+    await _stateSub?.cancel();
     return super.close();
   }
 }
