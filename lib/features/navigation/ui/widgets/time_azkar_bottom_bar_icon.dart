@@ -1,20 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:islami_app/core/helpers/app_assets.dart';
 import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/core/widgets/salomon_bottom_bar.dart';
 
 SalomonBottomBarItem timeAzkarBottomBarIcon() {
   return SalomonBottomBarItem(
-    icon: SvgPicture.asset(
-      Assets.svgsIconTimeAzkar,
-      colorFilter: const ColorFilter.mode(ColorsManager.black, BlendMode.srcIn),
-    ),
-    title: const Text("الوقت", style: TextStyle(color: Colors.white)),
+    icon: const Icon(Icons.more_horiz, color: ColorsManager.black),
+    title: const Text("المزيد", style: TextStyle(color: Colors.white)),
     selectedColor: ColorsManager.black,
-    activeIcon: SvgPicture.asset(
-      Assets.svgsIconTimeAzkar,
-      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-    ),
+    activeIcon: const Icon(Icons.more_horiz, color: Colors.white),
   );
 }

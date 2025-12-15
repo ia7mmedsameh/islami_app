@@ -33,17 +33,13 @@ class SurahsShimmerLoading extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           shrinkWrap: true,
           itemCount: 8,
-          itemBuilder: (context, i) {
-            return const ShimmerItem();
-          },
-          separatorBuilder: (context, i) {
-            return const Divider(
-              thickness: 1,
-              color: Colors.white,
-              indent: 30,
-              endIndent: 30,
-            );
-          },
+          itemBuilder: (context, i) => const ShimmerItem(),
+          separatorBuilder: (context, i) => const Divider(
+            thickness: 1,
+            color: Colors.white,
+            indent: 30,
+            endIndent: 30,
+          ),
         ),
       ],
     );

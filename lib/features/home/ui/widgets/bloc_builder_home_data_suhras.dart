@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islami_app/core/helpers/app_assets.dart';
+import 'package:islami_app/core/helpers/extensions.dart';
 import 'package:islami_app/core/helpers/spacing.dart';
+import 'package:islami_app/core/routing/routes.dart';
+import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/core/widgets/app_text_form_field.dart';
 import 'package:islami_app/core/widgets/islami_logo_and_mosque.dart';
-import 'package:islami_app/core/widgets/setup_error.dart';
 import 'package:islami_app/features/home/data/models/surahs_response_model.dart';
 import 'package:islami_app/features/home/logic/cubit/home_cubit.dart';
 import 'package:islami_app/features/home/logic/cubit/home_state.dart';
-import 'package:islami_app/features/home/ui/widgets/quran_list_text_and_list_view_builder.dart';
-import 'package:islami_app/features/home/ui/widgets/surahs_shimmer_loading.dart';
+import 'package:islami_app/features/home/ui/widgets/surahs_list_body.dart';
 
 class BlocBuilderHomeDataSurahs extends StatefulWidget {
   const BlocBuilderHomeDataSurahs({super.key});
-
   @override
   State<BlocBuilderHomeDataSurahs> createState() =>
       _BlocBuilderHomeDataSurahsState();
@@ -32,10 +32,8 @@ class _BlocBuilderHomeDataSurahsState extends State<BlocBuilderHomeDataSurahs> {
   }
 
   String normalizeArabic(String str) {
-    final harakat = RegExp(r'[ًٌٍَُِّْـ]');
-    str = str.replaceAll(harakat, '');
-    str = str.replaceAll(RegExp(r'[أإآٱ]'), 'ا');
-    return str;
+    str = str.replaceAll(RegExp(r'[ًٌٍَُِّْـ]'), '');
+    return str.replaceAll(RegExp(r'[أإآٱ]'), 'ا');
   }
 
   void _filterSurahs(String query) {
@@ -63,7 +61,22 @@ class _BlocBuilderHomeDataSurahsState extends State<BlocBuilderHomeDataSurahs> {
         child: Column(
           children: [
             verticalSpace(15),
-            const IslamiLogoAndMosque(),
+            // صف يحتوي على اللوجو وأيقونة الإعدادات
+            Row(
+              children: [
+                const Expanded(child: IslamiLogoAndMosque()),
+                IconButton(
+                  onPressed: () =>
+                      context.pushNamed(Routes.privacyPolicyScreen),
+                  icon: Icon(
+                    Icons.info_outline,
+                    color: ColorsManager.mainGold,
+                    size: 28.sp,
+                  ),
+                  tooltip: 'سياسة الخصوصية',
+                ),
+              ],
+            ),
             verticalSpace(25),
             AppTextField(
               hintText: 'اسم السورة',
@@ -74,33 +87,15 @@ class _BlocBuilderHomeDataSurahsState extends State<BlocBuilderHomeDataSurahs> {
             verticalSpace(25),
             Expanded(
               child: BlocBuilder<HomeCubit, HomeState>(
-                builder: (context, state) {
-                  return state.maybeWhen(
-                    surahsLoading: () {
-                      return SingleChildScrollView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height - 200.h,
-                          child: const SurahsShimmerLoading(),
-                        ),
-                      );
-                    },
-                    surahsSuccess: (surahsResponseModel) {
-                      if (allSurahs.isEmpty) {
-                        allSurahs = surahsResponseModel.data ?? [];
-                      }
-                      final displayList = _searchController.text.isNotEmpty
-                          ? searchedSurahs
-                          : allSurahs;
-
-                      return QuranListTextAndListViewBuilder(
-                        surahsList: displayList,
-                      );
-                    },
-                    surahsError: (apiErrorModel) => setupError(apiErrorModel),
-                    orElse: () => const SizedBox.shrink(),
-                  );
-                },
+                builder: (context, state) => SurahsListBody(
+                  state: state,
+                  allSurahs: allSurahs,
+                  searchedSurahs: searchedSurahs,
+                  searchText: _searchController.text,
+                  onSurahsLoaded: (surahs) {
+                    if (allSurahs.isEmpty) allSurahs = surahs;
+                  },
+                ),
               ),
             ),
           ],

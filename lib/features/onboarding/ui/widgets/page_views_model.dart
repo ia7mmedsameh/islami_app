@@ -76,7 +76,7 @@ PageViewModel pageViewModelOne() {
         verticalSpace(20),
         const OnboardingDescription(
           textIdentification: 'مرحبًا بك في تطبيق إسلامي',
-          textExplain: 'سعداء باختيارك تطبيق يقرّبك إلى الله',
+          textExplain: 'سعيد باختيارك تطبيق يقرّبك إلى الله',
         ),
       ],
     ),

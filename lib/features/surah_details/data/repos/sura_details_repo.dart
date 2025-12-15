@@ -3,7 +3,6 @@ import 'package:islami_app/core/networking/api_result.dart';
 import 'package:islami_app/core/networking/api_service.dart';
 import 'package:islami_app/features/surah_details/data/models/sura_details_response_model.dart';
 
-/// Repository for surah details data operations
 class SuraDetailsRepo {
   final ApiService apiService;
 

@@ -1,116 +1,61 @@
-import 'dart:async';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:islami_app/core/audio_manager/global_audio_manager.dart';
+import 'package:islami_app/core/di/dependency_injection.dart';
 import 'package:islami_app/features/surah_details/logic/cubit/audio_state.dart';
+import 'package:islami_app/features/surah_details/logic/cubit/audio_cubit_base.dart';
+import 'package:islami_app/features/surah_details/logic/cubit/audio_cubit_listeners.dart';
+import 'package:islami_app/features/surah_details/logic/cubit/audio_cubit_controls.dart';
+import 'package:islami_app/features/surah_details/logic/cubit/audio_cubit_ready.dart';
 import 'package:islami_app/features/surah_details/ui/helper/audio_constants.dart';
-import 'package:islami_app/core/audio_handler/radio_audio_handler.dart';
 import 'package:just_audio/just_audio.dart';
 
-class AudioCubit extends Cubit<AudioState> {
-  final RadioAudioHandler _handler;
-  late final AudioPlayer _player;
-  StreamSubscription<Duration>? _posSub;
-  StreamSubscription<PlayerState>? _stateSub;
-  bool _sentReady = false;
+export 'package:islami_app/core/audio_handler/audio_handler.dart'
+    show RepeatMode;
 
-  AudioCubit(this._handler) : super(const AudioState.initial()) {
-    _player = _handler.player;
-  }
+class AudioCubit extends AudioCubitBase
+    with AudioCubitReady, AudioCubitListeners, AudioCubitControls {
+  AudioCubit(super.handler);
 
-  Future<void> setAudioSource(int surahNumber, String surahName) async {
+  Future<void> setAudioSource(
+    int n,
+    String name, {
+    bool autoPlay = true,
+  }) async {
     emit(const AudioState.loading());
-    _sentReady = false;
+    ready = false;
     try {
-      final url = AudioConstants.getSurahUrl(
-        surahNumber: surahNumber,
-        bitrate: AudioConstants.bitrate128,
+      await posSub?.cancel();
+      await stateSub?.cancel();
+      if (player.playing) await player.stop();
+      getIt<GlobalAudioManager>().playQuran(surahNumber: n, surahName: name);
+      setupListeners();
+      await handler.setQuranMedia(
+        url: AudioConstants.getSurahUrl(
+          surahNumber: n,
+          edition: AudioConstants.defaultEdition,
+        ),
+        surahName: name,
+        surahNumber: n,
+        autoPlay: autoPlay,
       );
-      _posSub?.cancel();
-      _stateSub?.cancel();
-      _posSub = _player.positionStream.listen((p) {
-        if (isClosed || !_sentReady) return;
-        if (state is Success) {
-          emit((state as Success).copyWith(position: p));
-        } else if (_player.playing)
-          _emitSuccess(p);
-      });
-      _stateSub = _player.playerStateStream.listen((s) async {
-        if (isClosed) return;
-        if (!_sentReady &&
-            (s.processingState == ProcessingState.ready || s.playing)) {
-          _checkReady();
-        }
-        if (_sentReady && state is Success) {
-          emit(
-            (state as Success).copyWith(
-              isPlaying: _player.playing,
-              total: _player.duration ?? Duration.zero,
-            ),
-          );
-        }
-        if (s.processingState == ProcessingState.completed) {
-          await _player.seek(Duration.zero);
-          await _player.play();
-        }
-      });
-      _player.durationStream.listen((d) {
-        if (_sentReady && d != null && state is Success && !isClosed) {
-          emit((state as Success).copyWith(total: d));
-        }
-      });
-      await _handler.setQuranMedia(
-        url: url,
-        surahName: surahName,
-        surahNumber: surahNumber,
-      );
-      if (!_sentReady) {
-        try {
-          await _player.playerStateStream
-              .timeout(const Duration(seconds: 2))
-              .firstWhere(
-                (s) => s.processingState == ProcessingState.ready || s.playing,
-              );
-          _checkReady();
-        } catch (_) {
-          for (int i = 0; i < 20; i++) {
-            await Future.delayed(const Duration(milliseconds: 50));
-            if (isClosed || _sentReady || _checkReady()) break;
-          }
-        }
-      }
+      await waitForReady();
     } catch (_) {
-      if (!isClosed) emit(const AudioState.error("حدث خطأ أثناء تشغيل السورة"));
+      if (!isClosed) emit(const AudioState.error("حدث خطأ"));
     }
   }
-
-  bool _checkReady() {
-    if (_player.processingState == ProcessingState.ready || _player.playing) {
-      _sentReady = true;
-      _emitSuccess(_player.position);
-      return true;
-    }
-    return false;
-  }
-
-  void _emitSuccess(Duration position) {
-    emit(
-      AudioState.success(
-        isPlaying: _player.playing,
-        volume: _player.volume,
-        position: position,
-        total: _player.duration ?? Duration.zero,
-      ),
-    );
-  }
-
-  void pause() => isClosed ? null : _player.pause();
-  void resume() => isClosed ? null : _player.play();
-  void seek(Duration p) => isClosed ? null : _player.seek(p);
-  void setVolume(double v) => isClosed ? null : _player.setVolume(v);
 
   @override
-  Future<void> close() async {
-    await _posSub?.cancel();
-    await _stateSub?.cancel();
-    return super.close();
+  void onResumeIdle() => setAudioSource(1, '');
+
+  void connectToExistingPlayer() {
+    ready = false;
+    posSub?.cancel();
+    stateSub?.cancel();
+    setupListeners();
+    if (player.processingState == ProcessingState.ready || player.playing) {
+      ready = true;
+      emitOk(player.position);
+    } else {
+      emit(const AudioState.loading());
+    }
   }
 }

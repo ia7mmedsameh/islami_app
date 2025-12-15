@@ -37,6 +37,11 @@ class Assets {
   static const String imagesBackgroundHome =
       "assets/images/background_home.png";
 
+  /// Assets for imagesBackgroundPrayTime
+  /// assets/images/backgroung_pray_time.png
+  static const String imagesBackgroundPrayTime =
+      "assets/images/backgroung_pray_time.png";
+
   /// Assets for imagesBackgroundRadioScreen
   /// assets/images/background_radio_screen.png
   static const String imagesBackgroundRadioScreen =

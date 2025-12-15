@@ -17,13 +17,12 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.light,
-      ),
+      const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
     );
 
     return Scaffold(
       backgroundColor: ColorsManager.black,
+      resizeToAvoidBottomInset: false,
       body: body,
       appBar: appBar,
       bottomNavigationBar: bottomNavigationBar,

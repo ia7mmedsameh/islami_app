@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:islami_app/core/helpers/spacing.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/core/widgets/islami_logo_and_mosque.dart';
 import 'package:islami_app/features/sebha/ui/widgets/background_for_sebha_screen.dart';
@@ -21,15 +21,11 @@ class _SebhaScreenState extends State<SebhaScreen> {
 
   void _incrementCounter() {
     HapticFeedback.lightImpact();
-    setState(() {
-      _counter++;
-    });
+    setState(() => _counter++);
   }
 
   void _resetCounter() {
-    setState(() {
-      _counter = 0;
-    });
+    setState(() => _counter = 0);
   }
 
   @override
@@ -47,19 +43,22 @@ class _SebhaScreenState extends State<SebhaScreen> {
           SafeArea(
             child: Column(
               children: [
-                verticalSpace(15),
+                SizedBox(height: 15.h),
                 const IslamiLogoAndMosque(),
                 Expanded(
-                  child: Column(
-                    children: [
-                      verticalSpace(30),
-                      const SebhaHeaderText(),
-                      verticalSpace(30),
-                      SebhaRosaryWidget(
-                        counter: _counter,
-                        onTap: _incrementCounter,
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 30.h),
+                        const SebhaHeaderText(),
+                        SizedBox(height: 30.h),
+                        SebhaRosaryWidget(
+                          counter: _counter,
+                          onTap: _incrementCounter,
+                        ),
+                        SizedBox(height: 20.h),
+                      ],
+                    ),
                   ),
                 ),
                 SebhaResetButton(onPressed: _resetCounter),

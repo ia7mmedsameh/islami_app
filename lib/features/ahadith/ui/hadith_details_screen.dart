@@ -6,7 +6,6 @@ import 'package:islami_app/core/widgets/custom_scaffold.dart';
 import 'package:islami_app/features/ahadith/data/models/ahadith_response_model.dart';
 import 'package:islami_app/features/ahadith/ui/widgets/hadith_details_body.dart';
 
-/// Screen that displays hadith details
 class HadithDetailsScreen extends StatelessWidget {
   final Data hadith;
 

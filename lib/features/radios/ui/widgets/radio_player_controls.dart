@@ -1,88 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:islami_app/core/theming/colors.dart';
-import 'package:islami_app/core/theming/styles.dart';
 import 'package:islami_app/features/radios/logic/cubit/radio_cubit.dart';
+import 'package:islami_app/features/radios/ui/widgets/radio_player_header.dart';
+import 'package:islami_app/features/radios/ui/widgets/radio_player_buttons.dart';
 
-class RadioPlayerControls extends StatelessWidget {
+class RadioPlayerControls extends StatefulWidget {
   final String radioName;
+  final String radioUrl;
   final bool isPlaying;
   final double volume;
   final RadioCubit cubit;
+  final List<dynamic>? radios;
 
   const RadioPlayerControls({
     super.key,
     required this.radioName,
+    required this.radioUrl,
     required this.isPlaying,
     required this.volume,
     required this.cubit,
+    this.radios,
   });
+
+  @override
+  State<RadioPlayerControls> createState() => _RadioPlayerControlsState();
+}
+
+class _RadioPlayerControlsState extends State<RadioPlayerControls> {
+  bool _showVolumeSlider = false;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(radioName, style: AppTextStyles.font16WhiteBold),
+        RadioPlayerHeader(radioName: widget.radioName),
         SizedBox(height: 16.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Icon(
-                isPlaying ? Icons.pause : Icons.play_arrow,
-                color: Colors.white,
-                size: 32,
-              ),
-              onPressed: () => isPlaying ? cubit.pause() : cubit.resume(),
-            ),
-            IconButton(
-              icon: Icon(_getVolumeIcon(volume), color: Colors.white),
-              onPressed: () => _showVolumeSheet(context),
-            ),
-          ],
+        RadioPlayerButtons(
+          isPlaying: widget.isPlaying,
+          volume: widget.volume,
+          cubit: widget.cubit,
+          radios: widget.radios,
+          radioUrl: widget.radioUrl,
+          showVolumeSlider: _showVolumeSlider,
+          onVolumeToggle: () =>
+              setState(() => _showVolumeSlider = !_showVolumeSlider),
         ),
       ],
     );
   }
-
-  IconData _getVolumeIcon(double volume) {
-    if (volume == 0) return Icons.volume_off;
-    if (volume < 0.3) return Icons.volume_mute;
-    if (volume < 0.7) return Icons.volume_down;
-    return Icons.volume_up;
-  }
-
-  void _showVolumeSheet(BuildContext context) {
-    double currentVolume = volume;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ColorsManager.black,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setState) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("تحكم في الصوت", style: AppTextStyles.font16WhiteBold),
-                Slider(
-                  min: 0,
-                  max: 1,
-                  value: currentVolume,
-                  onChanged: (v) {
-                    setState(() => currentVolume = v);
-                    cubit.setVolume(v);
-                  },
-                  activeColor: ColorsManager.mainGold,
-                  inactiveColor: Colors.grey,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
 }
-

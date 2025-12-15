@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:islami_app/core/networking/api_result.dart';
 import 'package:islami_app/features/home/data/repos/home_repo.dart';
-
 import 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
@@ -10,29 +10,21 @@ class HomeCubit extends Cubit<HomeState> {
 
   void getAllSurahs() async {
     if (isClosed) return;
-    
-    // محاولة جلب البيانات المحلية أولاً (بدون loading)
     final cachedResponse = homeRepo.getCachedSurahs();
     if (cachedResponse != null) {
-      cachedResponse.when(
-        success: (surahsResponseModel) {
-          if (!isClosed) {
-            // إذا وُجدت بيانات محلية، نعرضها مباشرة
-            emit(HomeState.surahsSuccess(surahsResponseModel));
-          }
-        },
-        failure: (_) {
-          // إذا فشل parsing البيانات المحلية، نجلب من API
-          if (!isClosed) {
-            emit(const HomeState.surahsLoading());
-            _fetchFromApi();
-          }
-        },
-      );
+      if (cachedResponse is Success) {
+        if (!isClosed) {
+          emit(HomeState.surahsSuccess((cachedResponse as Success).data));
+          _saveSurahNamesToStorage((cachedResponse as Success).data.data);
+        }
+      } else {
+        if (!isClosed) {
+          emit(const HomeState.surahsLoading());
+          _fetchFromApi();
+        }
+      }
       return;
     }
-    
-    // إذا لم توجد بيانات محلية، نعرض loading ثم نجلب من API
     if (!isClosed) {
       emit(const HomeState.surahsLoading());
       _fetchFromApi();
@@ -43,17 +35,29 @@ class HomeCubit extends Cubit<HomeState> {
     if (isClosed) return;
     final response = await homeRepo.getAllSurahs(forceRefresh: true);
     if (isClosed) return;
-    response.when(
-      success: (surahsResponseModel) {
-        if (!isClosed) {
-          emit(HomeState.surahsSuccess(surahsResponseModel));
+    if (response is Success) {
+      if (!isClosed) {
+        emit(HomeState.surahsSuccess((response as Success).data));
+        _saveSurahNamesToStorage((response as Success).data.data);
+      }
+    } else if (response is Failure) {
+      if (!isClosed) {
+        emit(HomeState.surahsError((response as Failure).apiErrorModel));
+      }
+    }
+  }
+
+  Future<void> _saveSurahNamesToStorage(List<dynamic>? surahs) async {
+    if (surahs == null || surahs.isEmpty) return;
+    try {
+      final box = await Hive.openBox('app_settings');
+      final Map<String, String> surahNames = {};
+      for (final surah in surahs) {
+        if (surah.number != null && surah.name != null) {
+          surahNames[surah.number.toString()] = surah.name;
         }
-      },
-      failure: (apiErrorModel) {
-        if (!isClosed) {
-          emit(HomeState.surahsError(apiErrorModel));
-        }
-      },
-    );
+      }
+      await box.put('surah_names_map', surahNames);
+    } catch (_) {}
   }
 }

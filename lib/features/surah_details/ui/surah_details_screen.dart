@@ -10,7 +10,6 @@ import 'package:islami_app/features/surah_details/logic/cubit/sura_details_state
 import 'package:islami_app/features/surah_details/ui/widgets/surah_details_item.dart';
 import 'package:lottie/lottie.dart';
 
-/// Screen that displays surah details and audio player
 class SurahDetailsScreen extends StatelessWidget {
   final int surahNumber;
 

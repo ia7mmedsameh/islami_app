@@ -10,19 +10,15 @@ class AhadithCubit extends Cubit<AhadithState> {
 
   void getAllHadiths() async {
     if (isClosed) return;
-    
-    // محاولة جلب البيانات المحلية أولاً (بدون loading)
     final cachedResponse = ahadithRepo.getCachedAhadith();
     if (cachedResponse != null) {
       cachedResponse.when(
         success: (ahadithResponseModel) {
           if (!isClosed) {
-            // إذا وُجدت بيانات محلية، نعرضها مباشرة
             emit(AhadithState.ahadithSuccess(ahadithResponseModel));
           }
         },
         failure: (_) {
-          // إذا فشل parsing البيانات المحلية، نجلب من API
           if (!isClosed) {
             emit(const AhadithState.ahadithLoading());
             _fetchFromApi();
@@ -31,8 +27,6 @@ class AhadithCubit extends Cubit<AhadithState> {
       );
       return;
     }
-    
-    // إذا لم توجد بيانات محلية، نعرض loading ثم نجلب من API
     if (!isClosed) {
       emit(const AhadithState.ahadithLoading());
       _fetchFromApi();

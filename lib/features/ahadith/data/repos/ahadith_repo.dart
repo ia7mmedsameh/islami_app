@@ -11,7 +11,6 @@ class AhadithRepo {
 
   AhadithRepo(this.hadithApiService);
 
-  /// جلب البيانات المحلية فقط (بدون API)
   ApiResult<AhadithResponseModel>? getCachedAhadith() {
     try {
       final box = Hive.box(kAhadithBoxName);
@@ -36,8 +35,6 @@ class AhadithRepo {
   }) async {
     try {
       final box = Hive.box(kAhadithBoxName);
-
-      // إذا لم يكن forceRefresh، نفحص البيانات المحلية أولاً
       if (!forceRefresh) {
         final cachedData = box.get(kAhadithDataKey);
         if (cachedData != null) {
@@ -45,26 +42,16 @@ class AhadithRepo {
             final jsonData = jsonDecode(cachedData as String);
             final cachedModel = AhadithResponseModel.fromJson(jsonData);
             return ApiResult.success(cachedModel);
-          } catch (_) {
-            // إذا فشل parsing البيانات المحلية، نكمل لجلبها من API
-          }
+          } catch (_) {}
         }
       }
-
-      // جلب البيانات من API
       final response = await hadithApiService.getAllHadiths();
-
-      // حفظ البيانات في Hive
       try {
         final jsonString = jsonEncode(response.toJson());
         await box.put(kAhadithDataKey, jsonString);
-      } catch (_) {
-        // إذا فشل الحفظ، نكمل بدون error
-      }
-
+      } catch (_) {}
       return ApiResult.success(response);
     } catch (error) {
-      // في حالة error، نحاول إرجاع البيانات المحلية كـ fallback
       try {
         final box = Hive.box(kAhadithBoxName);
         final cachedData = box.get(kAhadithDataKey);
@@ -73,9 +60,7 @@ class AhadithRepo {
           final cachedModel = AhadithResponseModel.fromJson(jsonData);
           return ApiResult.success(cachedModel);
         }
-      } catch (_) {
-        // إذا فشل، نرجع error
-      }
+      } catch (_) {}
       return ApiResult.failure(ApiErrorHandler.handle(error));
     }
   }

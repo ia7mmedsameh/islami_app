@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:islami_app/core/helpers/app_assets.dart';
 import 'package:islami_app/core/helpers/extensions.dart';
@@ -25,21 +24,25 @@ class SurasQuranListTile extends StatelessWidget {
           child: ListTile(
             contentPadding: const EdgeInsets.all(0),
             leading: SizedBox(
-              width: 60.w,
-              height: 60.h,
+              width: 55,
+              height: 55,
               child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  SvgPicture.asset(Assets.svgsVector),
-                  Center(
-                    child: Text(
-                      surahsData?.number?.toString() ?? '',
-                      style: AppTextStyles.font20WhiteBold.copyWith(
-                        fontSize: (surahsData?.number ?? 0) > 99
-                            ? 12.3.sp
-                            : (surahsData?.number ?? 0) > 9
-                            ? 16.sp
-                            : 20.sp,
-                      ),
+                  SvgPicture.asset(
+                    Assets.svgsVector,
+                    width: 55,
+                    height: 55,
+                    fit: BoxFit.contain,
+                  ),
+                  Text(
+                    surahsData?.number?.toString() ?? '',
+                    style: AppTextStyles.font20WhiteBold.copyWith(
+                      fontSize: (surahsData?.number ?? 0) > 99
+                          ? 12
+                          : (surahsData?.number ?? 0) > 9
+                          ? 15
+                          : 18,
                     ),
                   ),
                 ],
@@ -55,7 +58,7 @@ class SurasQuranListTile extends StatelessWidget {
             ),
             title: Text(
               surahsData?.name ?? '',
-              style: AppTextStyles.font20WhiteBold2
+              style: AppTextStyles.font20WhiteBold2,
             ),
           ),
         ),

@@ -35,7 +35,6 @@ class _BlocBuilderAhadithState extends State<BlocBuilderAhadith> {
 
             final hadith = hadithList[widget.index % hadithList.length];
 
-            // استدعاء callback فقط إذا تغير الحديث
             if (hadith.id != _lastHadith?.id && widget.onHadithReady != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (mounted) {
