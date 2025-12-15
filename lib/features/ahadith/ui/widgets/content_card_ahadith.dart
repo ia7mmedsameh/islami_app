@@ -34,9 +34,13 @@ class _ContentCardAhadithState extends State<ContentCardAhadith> {
         elevation: 6,
         child: Stack(
           children: [
-            Image.asset(
-              Assets.imagesMoshaf,
-              color: const Color.fromARGB(36, 32, 32, 32),
+            Padding(
+              padding: EdgeInsets.all(30.w),
+              child: Image.asset(
+                Assets.imagesMoshaf,
+                color: const Color.fromARGB(36, 32, 32, 32),
+                
+              ),
             ),
             Align(
               alignment: Alignment.bottomCenter,

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive/hive.dart';
+import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/features/prayer_times/logic/cubit/prayer_times_cubit.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings/settings_switch_tile.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings/settings_interval_selector.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings/settings_section.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsSheetAzkar extends StatelessWidget {
   final bool azkarEnabled;
@@ -32,6 +34,53 @@ class SettingsSheetAzkar extends StatelessWidget {
           subtitle: 'تذكير بأذكار متنوعة',
           value: azkarEnabled,
           onChanged: (v) async {
+            if (v) {
+              // عند محاولة التفعيل، نتحقق من صلاحية الإشعارات
+              final status = await Permission.notification.status;
+
+              if (status.isPermanentlyDenied) {
+                // الصلاحية مرفوضة للأبد
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'يجب تفعيل الإشعارات من إعدادات الجهاز لاستخدام تذكير الأذكار',
+                        style: TextStyle(fontFamily: 'Janna-LT'),
+                      ),
+                      backgroundColor: Colors.red.shade700,
+                      duration: const Duration(seconds: 3),
+                      action: SnackBarAction(
+                        label: 'الإعدادات',
+                        textColor: Colors.white,
+                        onPressed: () => openAppSettings(),
+                      ),
+                    ),
+                  );
+                }
+                return;
+              }
+
+              if (!status.isGranted) {
+                // طلب الصلاحية
+                final result = await Permission.notification.request();
+                if (!result.isGranted) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'يجب تفعيل الإشعارات لاستخدام تذكير الأذكار',
+                          style: TextStyle(fontFamily: 'Janna-LT'),
+                        ),
+                        backgroundColor: ColorsManager.mainGold,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                  return;
+                }
+              }
+            }
+
             onEnabledChanged(v);
             final box = await Hive.openBox('app_settings');
             await box.put('azkar_reminder_enabled', v);

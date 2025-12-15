@@ -88,8 +88,7 @@ class AppInitializer {
   }
 
   static Future<void> _requestPermissions() async {
-    await Permission.notification.request();
-    // لا نطلب إذن الموقع هنا - يتم طلبه بعد الـ onboarding فقط
+    // لا نطلب إذن الإشعارات أو الموقع هنا - يتم طلبهم في الـ onboarding
     if (await Permission.scheduleExactAlarm.isDenied) {
       await Permission.scheduleExactAlarm.request();
     }

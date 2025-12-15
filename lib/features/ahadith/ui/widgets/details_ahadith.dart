@@ -49,7 +49,7 @@ class DetailsAhadith extends StatelessWidget {
             Text(
               hadith.hadithArabic ?? "حدث خطأ غير متوقع",
               textAlign: TextAlign.center,
-              maxLines: 16,
+              maxLines: 13,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.font18Blacksemibold,
             ),
