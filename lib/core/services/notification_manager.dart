@@ -34,7 +34,7 @@ class NotificationManager {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-    await android?.requestNotificationsPermission();
+    // لا نطلب إذن الإشعارات هنا - يتم طلبه في الـ onboarding
     await android?.requestExactAlarmsPermission();
   }
 

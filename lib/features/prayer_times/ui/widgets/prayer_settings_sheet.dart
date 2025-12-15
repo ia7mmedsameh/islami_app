@@ -7,6 +7,7 @@ import 'package:islami_app/features/prayer_times/ui/widgets/settings_sheet/setti
 import 'package:islami_app/features/prayer_times/ui/widgets/settings_sheet/settings_sheet_salah.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings_sheet/settings_sheet_azkar.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings_sheet/privacy_link_button.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PrayerSettingsSheet extends StatefulWidget {
   const PrayerSettingsSheet({super.key});
@@ -15,9 +16,10 @@ class PrayerSettingsSheet extends StatefulWidget {
 }
 
 class _PrayerSettingsSheetState extends State<PrayerSettingsSheet> {
-  bool adhanEnabled = true, salahEnabled = true, azkarEnabled = true;
+  bool adhanEnabled = true, salahEnabled = true, azkarEnabled = false;
   bool isLoading = true;
   int salahInterval = 4, azkarInterval = 3;
+  String? azkarError;
 
   @override
   void initState() {
@@ -27,13 +29,25 @@ class _PrayerSettingsSheetState extends State<PrayerSettingsSheet> {
 
   Future<void> _loadSettings() async {
     final box = await Hive.openBox('app_settings');
+    final notificationStatus = await Permission.notification.status;
+
     setState(() {
       adhanEnabled = box.get('adhan_enabled', defaultValue: true);
       salahEnabled = box.get('salah_reminder_enabled', defaultValue: true);
       salahInterval = box.get('salah_interval_hours', defaultValue: 4);
-      azkarEnabled = box.get('azkar_reminder_enabled', defaultValue: true);
+      // الأذكار تعتمد على صلاحية الإشعارات
+      azkarEnabled =
+          notificationStatus.isGranted &&
+          box.get('azkar_reminder_enabled', defaultValue: false);
       azkarInterval = box.get('azkar_interval_hours', defaultValue: 3);
       isLoading = false;
+    });
+  }
+
+  void _showAzkarError(String message) {
+    setState(() => azkarError = message);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) setState(() => azkarError = null);
     });
   }
 
@@ -80,8 +94,10 @@ class _PrayerSettingsSheetState extends State<PrayerSettingsSheet> {
           SettingsSheetAzkar(
             azkarEnabled: azkarEnabled,
             azkarInterval: azkarInterval,
+            errorMessage: azkarError,
             onEnabledChanged: (v) => setState(() => azkarEnabled = v),
             onIntervalChanged: (v) => setState(() => azkarInterval = v),
+            onError: _showAzkarError,
           ),
           SizedBox(height: 24.h),
           const PrivacyLinkButton(),
