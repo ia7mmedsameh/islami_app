@@ -67,7 +67,6 @@ class AppInitializer {
 
   static Future<void> _autoSchedulePrayerTimes() async {
     try {
-      // التحقق من أن المستخدم قد شاهد الـ onboarding قبل طلب مواقيت الصلاة
       final onboardingBox = Hive.box(kOnboardingBoxName);
       final hasSeenOnboarding = onboardingBox.get(
         kOnboardingSeenKey,
@@ -75,7 +74,6 @@ class AppInitializer {
       );
 
       if (!hasSeenOnboarding) {
-        // لم يشاهد الـ onboarding بعد، لا نطلب الموقع
         return;
       }
 
@@ -88,7 +86,6 @@ class AppInitializer {
   }
 
   static Future<void> _requestPermissions() async {
-    // لا نطلب إذن الإشعارات أو الموقع هنا - يتم طلبهم في الـ onboarding
     if (await Permission.scheduleExactAlarm.isDenied) {
       await Permission.scheduleExactAlarm.request();
     }
