@@ -16,7 +16,7 @@ class AdhanService {
 
   Future<void> schedulePrayerNotifications({
     required Map<String, DateTime> prayerTimes,
-    bool vibrate = true,
+    bool vibrate = false,
   }) async =>
       await AlarmScheduler.schedulePrayerAlarms(prayerTimes, vibrate: vibrate);
   Future<void> scheduleSalahReminders({

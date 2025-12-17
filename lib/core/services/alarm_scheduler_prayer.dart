@@ -3,7 +3,7 @@ import 'package:alarm/alarm.dart';
 class PrayerAlarmScheduler {
   static Future<void> schedule(
     Map<String, DateTime> prayerTimes, {
-    bool vibrate = true,
+    bool vibrate = false,
   }) async {
     for (int i = 1; i <= 10; i++) {
       try {
@@ -36,7 +36,7 @@ class PrayerAlarmScheduler {
     required DateTime time,
     required String name,
     required bool isFajr,
-    bool vibrate = true,
+    bool vibrate = false,
   }) async {
     final assetPath = isFajr
         ? 'assets/alazan/adhan_fajr.mp3'

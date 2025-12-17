@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/features/prayer_times/logic/cubit/prayer_times_cubit.dart';
+import 'package:islami_app/features/prayer_times/logic/prayer_cache_manager.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings/settings_switch_tile.dart';
 import 'package:islami_app/features/prayer_times/ui/widgets/settings/settings_section.dart';
 
@@ -23,28 +23,26 @@ class SettingsSheetAdhan extends StatefulWidget {
 }
 
 class _SettingsSheetAdhanState extends State<SettingsSheetAdhan> {
-  bool _hasLocationPermission = true;
+  bool _hasCachedData = true;
 
   @override
   void initState() {
     super.initState();
-    _checkLocationPermission();
+    _checkCachedData();
   }
 
-  Future<void> _checkLocationPermission() async {
-    final permission = await Geolocator.checkPermission();
+  Future<void> _checkCachedData() async {
+    final cached = await PrayerCacheManager.load();
     if (mounted) {
       setState(() {
-        _hasLocationPermission =
-            permission == LocationPermission.always ||
-            permission == LocationPermission.whileInUse;
+        _hasCachedData = cached != null;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasLocationPermission) {
+    if (!_hasCachedData) {
       return _buildDisabledSection();
     }
     return SettingsSection(
@@ -81,11 +79,11 @@ class _SettingsSheetAdhanState extends State<SettingsSheetAdhan> {
           ),
           child: Row(
             children: [
-              Icon(Icons.location_off, color: Colors.orange, size: 24.sp),
+              Icon(Icons.info_outline, color: Colors.orange, size: 24.sp),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  'يتطلب الأذان صلاحية الموقع لتحديد مواقيت الصلاة',
+                  'يرجى تفعيل صلاحية الموقع اولاً',
                   style: TextStyle(color: Colors.white70, fontSize: 13.sp),
                 ),
               ),

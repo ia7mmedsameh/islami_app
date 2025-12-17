@@ -36,10 +36,7 @@ class PrayerCacheManager {
   }
 
   static bool isValid(PrayerTimesResponse data) {
-    final today = DateTime.now();
-    final todayStr =
-        '${today.day.toString().padLeft(2, '0')}-'
-        '${today.month.toString().padLeft(2, '0')}-${today.year}';
-    return data.data.date.gregorian.date == todayStr;
+    // الـ cache صالح دائماً - مش محتاج نجيب مواقيت جديدة
+    return true;
   }
 }

@@ -12,7 +12,7 @@ class PrayerSchedulerMethods {
     final prayerTimes = PrayerTimeCalculator.getPrayerTimes(data.data.timings);
     final box = await Hive.openBox('app_settings');
     final adhanEnabled = box.get('adhan_enabled', defaultValue: true);
-    final adhanVibrate = box.get('adhan_vibrate', defaultValue: true);
+    final adhanVibrate = box.get('adhan_vibrate', defaultValue: false);
     final salahEnabled = box.get('salah_reminder_enabled', defaultValue: true);
     final salahInterval = box.get('salah_interval_hours', defaultValue: 4);
     final salahVibrate = box.get('salah_vibrate', defaultValue: false);

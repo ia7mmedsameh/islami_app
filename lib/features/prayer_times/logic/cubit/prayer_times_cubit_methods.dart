@@ -21,14 +21,24 @@ class PrayerTimesCubitMethods {
           return;
         }
       }
-      final hasPermission = await _checkPermission(emit);
-      if (!hasPermission) {
-        if (cached != null) return;
+      // التحقق من الصلاحية بدون طلبها
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (cached == null) {
+          emit(
+            const PrayerTimesState.error(
+              'صلاحية الموقع غير مفعلة\nيرجى تفعيل صلاحية الموقع من إعدادات التطبيق لعرض أوقات الصلاة',
+            ),
+          );
+        }
         return;
       }
+
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
+          accuracy: LocationAccuracy.low,
+          timeLimit: Duration(seconds: 10),
         ),
       );
       final result = await repo.getPrayerTimes(
@@ -58,31 +68,5 @@ class PrayerTimesCubitMethods {
         emit(const PrayerTimesState.error('حدث خطأ أثناء جلب أوقات الصلاة'));
       }
     }
-  }
-
-  static Future<bool> _checkPermission(
-    void Function(PrayerTimesState) emit,
-  ) async {
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        emit(
-          const PrayerTimesState.error(
-            'تم رفض صلاحية الموقع\nيرجى السماح بالوصول للموقع لعرض أوقات الصلاة',
-          ),
-        );
-        return false;
-      }
-      if (permission == LocationPermission.deniedForever) {
-        emit(
-          const PrayerTimesState.error(
-            'تم رفض صلاحية الموقع بشكل دائم\nيرجى تفعيل صلاحية الموقع من إعدادات التطبيق',
-          ),
-        );
-        return false;
-      }
-    }
-    return true;
   }
 }

@@ -37,15 +37,13 @@ class NotificationManagerShow {
       zikr,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          'azkar_persistent_channel',
+          'azkar_channel',
           'تذكير بالأذكار',
           channelDescription: 'إشعارات التذكير بالأذكار',
           importance: Importance.high,
           priority: Priority.high,
-          playSound: false,
+          playSound: true,
           enableVibration: false,
-          autoCancel: false,
-          ongoing: true,
           styleInformation: BigTextStyleInformation(zikr),
         ),
       ),
@@ -59,28 +57,53 @@ class NotificationManagerShow {
     Duration duration,
   ) async {
     final tzTime = tz.TZDateTime.now(tz.local).add(duration);
-    await notifications.zonedSchedule(
-      id,
-      '💭 تذكير بالذكر',
-      zikr,
-      tzTime,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'azkar_persistent_channel',
-          'تذكير بالأذكار',
-          channelDescription: 'إشعارات التذكير بالأذكار',
-          importance: Importance.high,
-          priority: Priority.high,
-          playSound: false,
-          enableVibration: false,
-          autoCancel: false,
-          ongoing: true,
-          styleInformation: BigTextStyleInformation(zikr),
+    try {
+      await notifications.zonedSchedule(
+        id,
+        '💭 تذكير بالذكر',
+        zikr,
+        tzTime,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'azkar_channel',
+            'تذكير بالأذكار',
+            channelDescription: 'إشعارات التذكير بالأذكار',
+            importance: Importance.high,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: false,
+            styleInformation: BigTextStyleInformation(zikr),
+          ),
         ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (_) {
+      // Fallback: schedule with inexact timing
+      try {
+        await notifications.zonedSchedule(
+          id,
+          '💭 تذكير بالذكر',
+          zikr,
+          tzTime,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'azkar_channel',
+              'تذكير بالأذكار',
+              channelDescription: 'إشعارات التذكير بالأذكار',
+              importance: Importance.high,
+              priority: Priority.high,
+              playSound: true,
+              enableVibration: false,
+              styleInformation: BigTextStyleInformation(zikr),
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+        );
+      } catch (_) {}
+    }
   }
 }

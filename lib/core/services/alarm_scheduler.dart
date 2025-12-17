@@ -13,7 +13,7 @@ class AlarmScheduler {
 
   static Future<void> schedulePrayerAlarms(
     Map<String, DateTime> prayerTimes, {
-    bool vibrate = true,
+    bool vibrate = false,
   }) async {
     await Alarm.init();
     initializeAutoStop();

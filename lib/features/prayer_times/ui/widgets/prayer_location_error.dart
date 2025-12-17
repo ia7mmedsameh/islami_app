@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islami_app/core/theming/colors.dart';
 import 'package:islami_app/features/prayer_times/logic/cubit/prayer_times_cubit.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PrayerLocationError extends StatelessWidget {
   final String message;
@@ -57,6 +58,23 @@ class PrayerLocationError extends StatelessWidget {
               style: TextStyle(color: ColorsManager.black, fontSize: 14.sp),
             ),
           ),
+          if (message.contains('صلاحية')) ...[
+            SizedBox(height: 12.h),
+            OutlinedButton(
+              onPressed: () => openAppSettings(),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: ColorsManager.mainGold),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+              ),
+              child: Text(
+                'إعدادات التطبيق',
+                style: TextStyle(
+                  color: ColorsManager.mainGold,
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

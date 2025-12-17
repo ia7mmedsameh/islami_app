@@ -1,6 +1,7 @@
 import 'package:alarm/alarm.dart';
 import 'package:hive/hive.dart';
 import 'package:islami_app/core/services/adhan_service.dart';
+import 'package:islami_app/core/services/alarm_scheduler_azkar.dart';
 import 'package:islami_app/core/services/notification_manager.dart';
 import 'package:islami_app/features/prayer_times/data/models/prayer_times_model.dart';
 import 'package:islami_app/features/prayer_times/logic/prayer_scheduler_methods.dart';
@@ -64,15 +65,18 @@ class PrayerNotificationScheduler {
     if (!enabled) {
       final nm = NotificationManager();
       await nm.cancelAllAzkarNotifications();
-    } else if (data != null)
-      await schedule(data);
+    } else {
+      // جدولة الأذكار مباشرة
+      final intervalHours = box.get('azkar_interval_hours', defaultValue: 3);
+      await AzkarAlarmScheduler.schedule(intervalHours: intervalHours);
+    }
   }
 
   Future<void> updateAzkarInterval(int hours, PrayerTimesResponse? data) async {
     final box = await Hive.openBox('app_settings');
     await box.put('azkar_interval_hours', hours);
-    if (data != null && box.get('azkar_reminder_enabled', defaultValue: true)) {
-      await schedule(data);
+    if (box.get('azkar_reminder_enabled', defaultValue: false)) {
+      await AzkarAlarmScheduler.schedule(intervalHours: hours);
     }
   }
 }

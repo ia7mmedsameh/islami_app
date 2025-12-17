@@ -14,8 +14,10 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     : _scheduler = PrayerNotificationScheduler(adhanService),
       super(const PrayerTimesState.initial());
 
-  Future<void> getPrayerTimes() async {
-    emit(const PrayerTimesState.loading());
+  Future<void> getPrayerTimes({bool showLoading = true}) async {
+    if (showLoading && state is! Success) {
+      emit(const PrayerTimesState.loading());
+    }
     await PrayerTimesCubitMethods.fetchPrayerTimes(_repo, _scheduler, emit);
   }
 
